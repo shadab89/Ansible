@@ -1,0 +1,12 @@
+---
+- name: Create user on node machine using secret file
+  hosts: test-server
+  become: true
+  vars_files:
+    - secret.yml
+  tasks:
+    - name: Creating user
+      user:
+        name: "{{ username }}"
+        password: "{{ pwhash | password_hash('sha512')}}"
+...

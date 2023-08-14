@@ -1,0 +1,53 @@
+---
+- name: Playbook Control Lab
+  hosts: test-server
+  become: true
+  gather_facts: true
+  vars_files: vars.yml
+  tasks:
+    - name: Show failed system requirement message
+      debug:
+        msg: "{{ ansible_distribution }}"
+    - name: Debug
+      fail:
+        msg: "The {{ inventory_hostname }} did not meet min requirement"
+      when: >
+        ansible_memtotal_mb < 2048 or
+        ansible_distribution != "CentOS"
+    - name: Ensure all packages are present
+      yum:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ packages }}"
+    - name: Ensure all services got started
+      service:
+        name: "{{ item }}"
+        state: started
+        enabled: yes
+      loop: "{{ services }}"
+    - name: Setting up the SSL cert directory and config files
+      block:
+        - name: Create SSL cert directory
+          file:
+            name: "{{ ssl_cert_dir }}"
+            state: directory
+        - name: copy config files
+          copy:
+            src: "{{ item.src }}"
+            dest: "{{ item.dest }}"
+          loop: "{{ web_config_files }}"
+          notify: restart web server
+
+      rescue:
+        - name: config error message
+          debug:
+            msg: >
+              One or more config changes failed.
+              But, web service is still active
+  handlers:
+    - name: restart web server
+      yum:
+        service: "{{ webserver_svc }}"
+        state: restarted
+
+...

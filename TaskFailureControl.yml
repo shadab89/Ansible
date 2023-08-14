@@ -1,0 +1,22 @@
+---
+- name: Task Failure handling
+  hosts: test-server
+  become: true
+  gather_facts: true
+  vars:
+    mysqldb_packages: mysql-server
+    db_svc: mysqld
+    webserver_packages: http
+    webserver_svc: http
+  tasks:
+    - name: Installing {{ webserver_packages }}
+      yum:
+        name: "{{ webserver_packages }}"
+        state: present
+      ignore_errors: yes
+    - name: Installing {{ mysqldb_packages }}
+      yum:
+        name: "{{ mysqldb_packages }}"
+        state: present
+      
+...

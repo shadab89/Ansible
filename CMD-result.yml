@@ -1,0 +1,16 @@
+---
+- name: Task Failure handling with command result
+  hosts: test-server
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Check local time
+      command: date
+      register: command_result
+      
+    - name: Print local time
+      debug:
+        var: command_result.stdout
+
+      
+...

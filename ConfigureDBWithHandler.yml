@@ -1,0 +1,37 @@
+---
+- name: Configure DB with handler
+  hosts: test-server
+  become: true
+  gather_facts: true
+  vars:
+    mysqldb_packages:
+      - mysql-server
+      - python3-PyMySQL
+    db_svc: mysqld
+  tasks:
+    - name: Installing mysql-server
+      yum:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ mysqldb_packages }}"
+      notify:
+        - set db password
+        - restart db
+       
+    - name: start and enable mysql service
+      service:
+        name: "{{ db_svc }}"
+        state: started
+        enabled: yes
+        
+  handlers:
+    - name: set db password
+      mysql_user: 
+        user: root
+        password: redhat
+    - name: restart db
+      service:
+        name: "{{ db_svc }}"
+        state: restarted
+
+...

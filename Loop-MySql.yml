@@ -1,0 +1,21 @@
+---
+- name: Install mysql
+  hosts: test-server
+  become: true
+  gather_facts: true
+  vars:
+    mysqldb_packages:
+      - mysql-server
+      - python3-PyMySQL
+  tasks:
+    - name: Installing mysql-server
+      yum:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ mysqldb_packages }}"
+    - name: start and enable mysql service
+      service:
+        name: mysqld
+        state: started
+        enabled: yes
+...

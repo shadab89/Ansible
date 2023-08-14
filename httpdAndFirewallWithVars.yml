@@ -1,0 +1,52 @@
+---
+- name: Install Httpd and enable internet
+  hosts: test-server
+  become: true
+  gather_facts: true
+  vars:
+    web_pkg: httpd
+    firewall_pkg: firewalld
+    web_service: httpd
+    firewall_service: firewalld
+    python_pkg: python3-PyMySQL
+    rule: http
+  tasks:
+    - name: Installation {{web_pkg}}, {{firewall_pkg}}
+      yum:
+        name:
+        - "{{web_pkg}}"
+        - "{{firewall_pkg}}"
+        - "{{python_pkg}}"
+        state: latest
+    - name: Enable and start {{firewall_service}}
+      service:
+        name: "{{firewall_service}}"
+        enabled: true
+        state: started
+    - name: Enable and start {{web_service}}
+      service:
+        name: "{{web_service}}"
+        enabled: true
+        state: started
+    - name: Copy content
+      copy:
+        content: "To check variable "
+        dest: /var/www/html/index.html
+    - name: To check port for {{rule}} is open
+      firewalld:
+        service: {{rule}}
+        permanent: true
+        immediate: true
+        state: enabled
+        
+- name: Test intranet server
+  hosts: localhost
+  become: no
+  tasks:
+    - name: Check intranet web server
+      uri: 
+        url: http://console
+        return-content: yes
+        status_code: 200
+
+...

@@ -1,0 +1,51 @@
+---
+- name: Install Apache & PHP & MYSQL
+  hosts: test-server
+  become: true
+  gather_facts: true
+  tasks:
+    - name: yum update
+      yum: name=* state=latest
+    - name: Install Apache2
+      yum:
+        name: httpd
+        state: present
+    - name: Installing php
+      yum:
+        enablerepo: "remi,remi-php81" # If you intent to install a different version of PHP, you can change the repo according. Eg : "remi,remi-php74"
+        name:
+        - php
+        - php-common
+        - php-cli
+        - php-gd
+        - php-curl #You can add or remove PHP extensions according to your choice
+        - php-mysqlnd
+        - php-fpm
+        - php-mysqli
+        state: latest
+    - name: install mysql server
+      yum:
+        name: 
+        - mysql-server
+        - mysql
+        state: present
+    - name: start and enable mysql service
+      service:
+        name: mysqld
+        state: started
+        enabled: yes
+    - name: pip setup
+      yum:
+        name: python3-pip
+        state: present
+    - name: MySQL python3
+      yum:
+        name: python3-PyMySQL
+        state: present
+    - name: Create DB user
+      mysql_user: user=shadab password=shadab priv=*.*:ALL state=present
+    - name: Create DB test
+      mysql_db: db=test state=present
+    #- name: Create Table #This block will be used when you are creating table first time for test
+      #command: mysql -u shadab -pshadab -e 'CREATE TABLE Name (name varchar(30), email varchar(30));' test
+...

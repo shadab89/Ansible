@@ -1,0 +1,29 @@
+---
+- name: Task Failure handling with Block, Rescue and Always
+  hosts: test-server
+  become: true
+  gather_facts: true
+  vars:
+    mysqldb_packages: mysql-server
+    db_svc: mysqld
+    webserver_packages: http
+    webserver_svc: http
+  tasks:
+    - name: handling with Block
+      block:
+        - name: Installing {{ webserver_packages }}
+          yum:
+            name: "{{ webserver_packages }}"
+            state: present
+      rescue:
+        - name: Installing {{ mysqldb_packages }}
+          yum:
+            name: "{{ mysqldb_packages }}"
+            state: present
+      always:
+        - name: start {{ db_svc }} service
+          service:
+            name: "{{ db_svc }}"
+            state: started
+      
+...

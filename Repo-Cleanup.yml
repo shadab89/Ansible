@@ -1,0 +1,15 @@
+---
+- name: Install Apache & PHP & MYSQL
+  hosts: test-server
+  become: true
+  gather_facts: true
+  tasks:
+    - name: yum-clean-metadata
+      ansible.builtin.command: yum clean metadata
+
+    # Example removing a repository and cleaning up metadata cache
+    - name: Remove repository (and clean up left-over metadata)
+      ansible.builtin.yum_repository:
+        name: remi-release-9.rpm
+        state: absent
+      notify: yum-clean-metadata

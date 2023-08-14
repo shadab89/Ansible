@@ -1,0 +1,7 @@
+ansible-vault create secret.yml -- to create a encrypted file
+ansible-vault view secret.yml -- to view a encrypted file
+ansible-vault edit secret.yml -- to edit a encrypted file
+ansible-playbook create_user.yml --syntax-check --ask-vault-pass -- to check the syntax of playbook with vault
+ansible-playbook create_user.yml --ask-vault-pass -- run playbook using vault password on prompt
+ansible-playbook --vault-password-file=vault-file create_user.yml -- run playbook using vault password in file
+ssh -o PreferredAuthentications=password ansibleuser@node -- to check the user after create user from master with pwd auth

@@ -1,0 +1,48 @@
+---
+- name: Install Httpd and enable internet
+  hosts: test-server
+  become: true
+  gather_facts: true
+  tasks:
+    - name: yum update
+      yum: name=* state=latest
+    - name: Installation httpd, Firewall, PHP, MariaDB
+      yum:
+        name:
+        - httpd
+        - firewalld
+        - mariadb-server
+        - php
+        - php-mysqlnd
+        state: latest
+    - name: Enable and start Firewall
+      service:
+        name: firewalld
+        enabled: true
+        state: started
+    - name: Enable and start httpd
+      service:
+        name: http
+        enabled: true
+        state: started
+    - name: Enable and start MariaDB
+      service:
+        name: mariadb
+        enabled: true
+        state: started
+    - name: Copy content
+      copy:
+        src: files/index.php
+        dest: /var/www/html/index.php
+        
+- name: Test intranet server
+  hosts: localhost
+  become: no
+  tasks:
+    - name: Check intranet web server
+      uri: 
+        url: http://console
+        return-content: yes
+        status_code: 200
+
+...
